@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restaurant Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .dashboard-container {
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .stat-card h3 {
+            margin: 0;
+            color: var(--primary-color);
+        }
+        .stat-card p {
+            font-size: 2rem;
+            margin: 0.5rem 0;
+        }
+        .chart-container {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+        .orders-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        .orders-table th, .orders-table td {
+            padding: 0.8rem;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        .orders-table th {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        .status-pending { color: #ffc107; }
+        .status-completed { color: #28a745; }
+        .status-cancelled { color: #dc3545; }
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        .logout-btn {
+            padding: 0.5rem 1rem;
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .logout-btn:hover {
+            background-color: #c82333;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="admin-header">
+            <h1>Restaurant Dashboard</h1>
+            <a href="{{ url_for('admin_logout') }}" class="logout-btn">Logout</a>
+        </div>
+
+        <nav class="sidebar">
+            <div class="logo">Green Leaf Admin</div>
+            <ul>
+                <li><a href="#" class="active" data-section="overview">Overview</a></li>
+                <li><a href="#" data-section="orders">Orders</a></li>
+                <li><a href="#" data-section="employees">Employees</a></li>
+                <li><a href="#" data-section="customers">Customers</a></li>
+                <li><a href="/" target="_blank">View Website</a></li>
+            </ul>
+        </nav>
+
+        <main class="main-content">
+            <header>
+                <h1>Dashboard</h1>
+                <div class="date">{{ current_date }}</div>
+            </header>
+
+            <section id="overview" class="dashboard-section active">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3>Total Orders Today</h3>
+                        <p>{{ stats.orders_today }}</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Revenue Today</h3>
+                        <p>${{ "%.2f"|format(stats.revenue_today) }}</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Active Orders</h3>
+                        <p>{{ stats.active_orders }}</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Total Customers</h3>
+                        <p>{{ stats.total_customers }}</p>
+                    </div>
+                </div>
+
+                <div class="charts-grid">
+                    <div class="chart-container">
+                        <h3>Weekly Revenue</h3>
+                        <canvas id="revenueChart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h3>Popular Items</h3>
+                        <canvas id="itemsChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <section id="orders" class="dashboard-section">
+                <div class="section-header">
+                    <h2>Recent Orders</h2>
+                    <div class="filters">
+                        <select id="statusFilter">
+                            <option value="">All Status</option>
+                            <option value="Pending">Pending</option>
+                            <option value="In Progress">In Progress</option>
+                            <option value="Completed">Completed</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table class="orders-table">
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Customer</th>
+                                <th>Items</th>
+                                <th>Total</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for order in orders %}
+                            <tr>
+                                <td>#{{ order.order_id }}</td>
+                                <td>{{ order.customer_name }}</td>
+                                <td>
+                                    {% for item in order.items %}
+                                    {{ item.quantity }}x {{ item.item_name }}<br>
+                                    {% endfor %}
+                                </td>
+                                <td>${{ "%.2f"|format(order.total_amount) }}</td>
+                                <td>
+                                    <span class="status-badge {{ order.status.lower() }}">
+                                        {{ order.status }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <button class="btn-update" data-order-id="{{ order.order_id }}">Update</button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="employees" class="dashboard-section">
+                <div class="section-header">
+                    <h2>Employees</h2>
+                    <button class="btn-add">Add Employee</button>
+                </div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Department</th>
+                                <th>Contact</th>
+                                <th>Orders Handled</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for emp in employees %}
+                            <tr>
+                                <td>#{{ emp.emp_id }}</td>
+                                <td>{{ emp.first_name }} {{ emp.last_name }}</td>
+                                <td>{{ emp.dept_name }}</td>
+                                <td>
+                                    {{ emp.email }}<br>
+                                    {{ emp.phone }}
+                                </td>
+                                <td>{{ emp.orders_handled }}</td>
+                                <td>
+                                    <button class="btn-edit" data-emp-id="{{ emp.emp_id }}">Edit</button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="customers" class="dashboard-section">
+                <div class="section-header">
+                    <h2>Customers</h2>
+                </div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Contact</th>
+                                <th>Total Orders</th>
+                                <th>Total Spent</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for customer in customers %}
+                            <tr>
+                                <td>#{{ customer.customer_id }}</td>
+                                <td>{{ customer.name }}</td>
+                                <td>
+                                    {{ customer.email }}<br>
+                                    {{ customer.phone }}
+                                </td>
+                                <td>{{ customer.total_orders }}</td>
+                                <td>${{ "%.2f"|format(customer.total_spent) }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+    <script>
+        // Hidden input fields containing data for charts
+        const weeklyRevenueData = {{ weekly_revenue|tojson }};
+        const popularItemsData = {{ popular_items|tojson }};
+
+        // Create Weekly Revenue Chart
+        const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+        new Chart(revenueCtx, {
+            type: 'line',
+            data: {
+                labels: weeklyRevenueData.map(d => d.date),
+                datasets: [{
+                    label: 'Revenue',
+                    data: weeklyRevenueData.map(d => d.revenue),
+                    borderColor: '#4CAF50',
+                    tension: 0.1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: value => '$' + value
+                        }
+                    }
+                }
+            }
+        });
+
+        // Create Popular Items Chart
+        const itemsCtx = document.getElementById('itemsChart').getContext('2d');
+        new Chart(itemsCtx, {
+            type: 'bar',
+            data: {
+                labels: popularItemsData.map(d => d.item_name),
+                datasets: [{
+                    label: 'Orders',
+                    data: popularItemsData.map(d => d.order_count),
+                    backgroundColor: '#4CAF50'
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // Function to update order status
+        function updateOrderStatus(orderId, status) {
+            fetch(`/update_order_status/${orderId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ status: status })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Optionally refresh the page or update the UI
+                    location.reload();
+                } else {
+                    alert('Failed to update order status');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Failed to update order status');
+            });
+        }
+    </script>
+</body>
+</html>
