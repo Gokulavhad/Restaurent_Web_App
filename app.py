@@ -216,23 +216,25 @@ init_db()
 # Load menu data with web image URLs
 MENU_DATA = {
     "starters": [
-        {"id": 1, "name": "Vegetable Spring Rolls", "price": 8.99, "image": "https://images.unsplash.com/photo-1606503825008-909a67e63c3d?w=400"},
-        {"id": 2, "name": "Garden Fresh Salad", "price": 7.99, "image": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400"},
-        {"id": 3, "name": "Crispy Corn", "price": 6.99, "image": "https://images.pexels.com/photos/603030/pexels-photo-603030.jpeg?auto=compress&cs=tinysrgb&w=400"},
-        {"id": 4, "name": "Mushroom Soup", "price": 5.99, "image": "https://images.pexels.com/photos/539451/pexels-photo-539451.jpeg?auto=compress&cs=tinysrgb&w=400"},
-        {"id": 5, "name": "Paneer Tikka", "price": 9.99, "image": "https://images.pexels.com/photos/9609838/pexels-photo-9609838.jpeg?auto=compress&cs=tinysrgb&w=400"}
+        {"id": 1, "name": "Spring Rolls", "price": 7.99, "image": "https://images.pexels.com/photos/2323398/pexels-photo-2323398.jpeg?auto=compress&cs=tinysrgb&w=400"},
+        {"id": 2, "name": "Vegetable Soup", "price": 5.99, "image": "https://images.pexels.com/photos/539451/pexels-photo-539451.jpeg?auto=compress&cs=tinysrgb&w=400"},
+        {"id": 3, "name": "Green Salad", "price": 6.99, "image": "https://images.pexels.com/photos/1213710/pexels-photo-1213710.jpeg?auto=compress&cs=tinysrgb&w=400"},
+        {"id": 4, "name": "Crispy Corn", "price": 8.99, "image": "https://images.pexels.com/photos/1528081/pexels-photo-1528081.jpeg?auto=compress&cs=tinysrgb&w=400"}
     ],
-    "mains": [
-        {"id": 6, "name": "Paneer Butter Masala", "price": 14.99, "image": "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=400"},
-        {"id": 7, "name": "Vegetable Biryani", "price": 13.99, "image": "https://images.unsplash.com/photo-1589302168068-964664d93dc0?w=400"},
-        {"id": 8, "name": "Dal Makhani", "price": 12.99, "image": "https://images.pexels.com/photos/2474661/pexels-photo-2474661.jpeg?auto=compress&cs=tinysrgb&w=400"},
-        {"id": 9, "name": "Veg Pasta Arrabiata", "price": 11.99, "image": "https://images.pexels.com/photos/1437267/pexels-photo-1437267.jpeg?auto=compress&cs=tinysrgb&w=400"},
-        {"id": 10, "name": "Buddha Bowl", "price": 13.99, "image": "https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=400"},
-        {"id": 11, "name": "Mushroom Risotto", "price": 15.99, "image": "https://images.pexels.com/photos/6287500/pexels-photo-6287500.jpeg?auto=compress&cs=tinysrgb&w=400"}
+    "main_course": [
+        {"id": 5, "name": "Paneer Tikka", "price": 14.99, "image": "https://images.pexels.com/photos/2474661/pexels-photo-2474661.jpeg?auto=compress&cs=tinysrgb&w=400"},
+        {"id": 6, "name": "Veg Biryani", "price": 12.99, "image": "https://images.pexels.com/photos/1624487/pexels-photo-1624487.jpeg?auto=compress&cs=tinysrgb&w=400"},
+        {"id": 7, "name": "Dal Makhani", "price": 11.99, "image": "https://images.pexels.com/photos/2474658/pexels-photo-2474658.jpeg?auto=compress&cs=tinysrgb&w=400"},
+        {"id": 8, "name": "Mushroom Curry", "price": 13.99, "image": "https://images.pexels.com/photos/1435904/pexels-photo-1435904.jpeg?auto=compress&cs=tinysrgb&w=400"}
+    ],
+    "breads": [
+        {"id": 9, "name": "Naan", "price": 2.99, "image": "https://images.pexels.com/photos/2474359/pexels-photo-2474359.jpeg?auto=compress&cs=tinysrgb&w=400"},
+        {"id": 10, "name": "Roti", "price": 1.99, "image": "https://images.pexels.com/photos/2474368/pexels-photo-2474368.jpeg?auto=compress&cs=tinysrgb&w=400"},
+        {"id": 11, "name": "Paratha", "price": 3.99, "image": "https://images.pexels.com/photos/2474360/pexels-photo-2474360.jpeg?auto=compress&cs=tinysrgb&w=400"}
     ],
     "desserts": [
         {"id": 12, "name": "Gulab Jamun", "price": 5.99, "image": "https://images.pexels.com/photos/14705134/pexels-photo-14705134.jpeg?auto=compress&cs=tinysrgb&w=400"},
-        {"id": 13, "name": "Mango Ice Cream", "price": 4.99, "image": "https://images.unsplash.com/photo-1560008581-09826d1de69e?w=400"},
+        {"id": 13, "name": "Mango Ice Cream", "price": 4.99, "image": "https://images.pexels.com/photos/1352278/pexels-photo-1352278.jpeg?auto=compress&cs=tinysrgb&w=400"},
         {"id": 14, "name": "Chocolate Brownie", "price": 6.99, "image": "https://images.pexels.com/photos/2067396/pexels-photo-2067396.jpeg?auto=compress&cs=tinysrgb&w=400"},
         {"id": 15, "name": "Fruit Tart", "price": 5.99, "image": "https://images.pexels.com/photos/2693447/pexels-photo-2693447.jpeg?auto=compress&cs=tinysrgb&w=400"},
         {"id": 16, "name": "Carrot Cake", "price": 6.99, "image": "https://images.pexels.com/photos/4110541/pexels-photo-4110541.jpeg?auto=compress&cs=tinysrgb&w=400"}
