@@ -246,6 +246,8 @@
             <a href="#contact">Contact</a>
             {% if session.get('admin_logged_in') %}
             <a href="{{ url_for('dashboard') }}">Dashboard</a>
+            {% else %}
+            <a href="{{ url_for('admin_login') }}">Admin Login</a>
             {% endif %}
         </div>
     </nav>
@@ -376,6 +378,11 @@
         </div>
     </section>
 
+    <div class="cart">
+        <h2>Your Cart</h2>
+        <p>No items in the cart.</p>
+    </div>
+
     <div id="cart-modal" class="modal">
         <div class="modal-content">
             <h2>Your Cart</h2>
@@ -398,7 +405,6 @@
                 <h4>Connect With Us</h4>
                 <div class="social-links">
                     <a href="#" class="social-link"><i class="fab fa-facebook"></i></a>
-                    <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
                     <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
                 </div>
             </div>

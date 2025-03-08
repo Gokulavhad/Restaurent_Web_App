@@ -6,6 +6,7 @@ import random
 import traceback
 from functools import wraps
 import hashlib
+import time
 
 app = Flask(__name__)
 app.secret_key = 'your-secret-key-here'  # Change this to a secure secret key
@@ -249,10 +250,11 @@ def admin_login():
         
         if username == ADMIN_USERNAME and password == ADMIN_PASSWORD:
             session['admin_logged_in'] = True
+            print(f"Admin logged in: {session.get('admin_logged_in')}")  # Debugging statement
             return redirect(url_for('dashboard'))
         else:
             return render_template('admin_login.html', error='Invalid credentials')
-    
+
     return render_template('admin_login.html')
 
 @app.route('/admin/logout')
@@ -267,12 +269,15 @@ def index():
 @app.route('/dashboard')
 @admin_login_required
 def dashboard():
+    print("Dashboard function started.")
+    
     try:
         conn = mysql.connector.connect(**db_config)
         cursor = conn.cursor(dictionary=True)
         
         # Get current date
         current_date = datetime.now().strftime('%B %d, %Y')
+        print(f"Current date: {current_date}")
         
         # Get dashboard statistics
         cursor.execute("""
@@ -281,12 +286,15 @@ def dashboard():
             WHERE DATE(order_date) = CURDATE()
         """)
         daily_stats = cursor.fetchone()
+        print(f"Daily stats: {daily_stats}")
         
         cursor.execute("SELECT COUNT(*) as active_orders FROM orders WHERE status != 'Completed'")
         active_orders = cursor.fetchone()['active_orders']
+        print(f"Active orders: {active_orders}")
         
         cursor.execute("SELECT COUNT(*) as total_customers FROM customers")
         total_customers = cursor.fetchone()['total_customers']
+        print(f"Total customers: {total_customers}")
         
         # Get weekly revenue data
         cursor.execute("""
@@ -297,6 +305,7 @@ def dashboard():
             ORDER BY date
         """)
         weekly_revenue = cursor.fetchall()
+        print(f"Weekly revenue data: {weekly_revenue}")
         
         # Get popular items
         cursor.execute("""
@@ -307,6 +316,7 @@ def dashboard():
             LIMIT 5
         """)
         popular_items = cursor.fetchall()
+        print(f"Popular items: {popular_items}")
         
         # Get recent orders with customer names
         cursor.execute("""
@@ -317,6 +327,7 @@ def dashboard():
             LIMIT 10
         """)
         orders = cursor.fetchall()
+        print(f"Recent orders: {orders}")
         
         # Get order items for each order
         for order in orders:
@@ -336,6 +347,7 @@ def dashboard():
             GROUP BY e.emp_id, e.first_name, e.last_name, e.email, e.phone, e.hire_date, e.salary, d.dept_name
         """)
         employees = cursor.fetchall()
+        print(f"Employees: {employees}")
         
         # Get customers with order statistics
         cursor.execute("""
@@ -347,6 +359,7 @@ def dashboard():
             GROUP BY c.customer_id, c.name, c.email, c.phone, c.address
         """)
         customers = cursor.fetchall()
+        print(f"Customers: {customers}")
         
         cursor.close()
         conn.close()
@@ -358,6 +371,13 @@ def dashboard():
             'total_customers': total_customers
         }
         
+        print(f"Stats to render: {stats}")
+        print(f"Current date: {current_date}")
+        print(f"Weekly Revenue: {[float(row['revenue']) for row in weekly_revenue]}")
+        print(f"Popular Items: {[{'name': row['item_name'], 'count': row['count']} for row in popular_items]}")
+        print(f"Orders: {orders}")
+        print(f"Employees: {employees}")
+        print(f"Customers: {customers}")
         return render_template('dashboard.html',
                              current_date=current_date,
                              stats=stats,
@@ -372,6 +392,7 @@ def dashboard():
         return "Database error occurred. Please check server logs.", 500
     except Exception as e:
         print(f"Error: {e}")
+        print(traceback.format_exc())  # Log the full traceback
         return "An error occurred.", 500
 
 @app.route('/api/orders/<int:order_id>/status', methods=['PUT'])
@@ -557,6 +578,8 @@ def login():
                 session['user_logged_in'] = True
                 session['user_id'] = user['user_id']
                 session['user_name'] = user['name']
+                print(f"Current session: {session}")  # Log the entire session state
+                print(f"Current session: {session}")  # Log the entire session state
                 flash('Login successful!', 'success')
                 return redirect(url_for('index'))
             else:
